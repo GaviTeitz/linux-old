@@ -1667,11 +1667,14 @@ skip_search:
 		goto search_again_locked;
 	}
 
+	err = -ENOENT;
 	list_for_each_entry(iter, match_head, list) {
 		g = iter->g;
 
-		if (!g->node.active)
+		if (!g->node.active) {
+			err = -EAGAIN;
 			continue;
+		}
 
 		nested_down_write_ref_node(&g->node, FS_LOCK_PARENT);
 
@@ -1692,7 +1695,7 @@ skip_search:
 		tree_put_node(&fte->node);
 		return rule;
 	}
-	rule = ERR_PTR(-ENOENT);
+	rule = ERR_PTR(err);
 out:
 	kmem_cache_free(steering->ftes_cache, fte);
 	return rule;
