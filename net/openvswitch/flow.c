@@ -868,12 +868,8 @@ int ovs_flow_key_extract(const struct ip_tunnel_info *tun_info,
 	key->mac_proto = res;
 
 #if IS_ENABLED(CONFIG_NET_TC_SKB_EXT)
-	if (static_branch_unlikely(&tc_recirc_sharing_support)) {
-		tc_ext = skb_ext_find(skb, TC_SKB_EXT);
-		key->recirc_id = tc_ext ? tc_ext->chain : 0;
-	} else {
-		key->recirc_id = 0;
-	}
+	tc_ext = skb_ext_find(skb, TC_SKB_EXT);
+	key->recirc_id = tc_ext ? tc_ext->chain : 0;
 #else
 	key->recirc_id = 0;
 #endif
